@@ -1,7 +1,7 @@
 /*
  *  CRUD
  *  Resource: Users
- * 
+ *
  *  Types of Params:
  *    Route params = /users/1
  *    Query params = /users?index=1
@@ -9,7 +9,7 @@
  */
 
 const express = require('express');
-const { logMiddleware } = require('./middleware');
+const { logMiddleware, checkUserExists } = require('./middleware');
 
 const server = express();
 
@@ -27,17 +27,17 @@ server.get('/users', (_, res) => {
 server.get('/users/:index', (req, res) => {
   const { index } = req.params;
   res.json(users[index]);
-}); 
+});
 
 // Create User
-server.post('/users', (req, res) => {
+server.post('/users', checkUserExists, (req, res) => {
   const { name } = req.body;
   users.push(name);
   res.status(201).json(users);
 });
 
 // Edit User
-server.put('/users', (req, res) => {
+server.put('/users', checkUserExists, (req, res) => {
   const { index } = req.query;
   const { name } = req.body;
   users[index] = name;
