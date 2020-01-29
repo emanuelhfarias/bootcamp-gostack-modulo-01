@@ -18,13 +18,20 @@ server.use(logMiddleware);
 
 const users = ['Emanuel', 'Fernanda'];
 
+function checkUserInArray(req, res, next) {
+  if (!users[req.params.index] && !users[req.query.index]) {
+    return res.status(400).json({error: 'User does not exist.'});
+  }
+  return next();
+}
+
 // List Users
 server.get('/users', (_, res) => {
   res.json(users);
 });
 
 // Get User
-server.get('/users/:index', (req, res) => {
+server.get('/users/:index', checkUserInArray, (req, res) => {
   const { index } = req.params;
   res.json(users[index]);
 });
@@ -37,7 +44,7 @@ server.post('/users', checkUserExists, (req, res) => {
 });
 
 // Edit User
-server.put('/users', checkUserExists, (req, res) => {
+server.put('/users', checkUserInArray, checkUserExists, (req, res) => {
   const { index } = req.query;
   const { name } = req.body;
   users[index] = name;
@@ -45,7 +52,7 @@ server.put('/users', checkUserExists, (req, res) => {
 });
 
 // Delete User
-server.delete('/users/:index', (req, res) => {
+server.delete('/users/:index', checkUserInArray, (req, res) => {
   const { index } = req.params;
   users.splice(index, 1);
   res.send();
